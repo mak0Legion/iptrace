@@ -1,0 +1,80 @@
+<div id="submit-button">
+    <a class="button-success pure-button" href="javascript:showHide('comment-form', 'submit-button');">Commenter</a>
+</div>
+
+<div id="comment-form" style="display:none">
+    <form class="pure-form" role="form" action="" onsubmit="this.action=get_action();" method="post">
+        <fieldset class="pure-group">
+
+            <input class="pure-u-1-2" id="author" name="author" type="text" placeholder="
+Name or Nickname (required)" required></input>
+            <input class="pure-u-1-2" id="email" name="email" type="email" placeholder="Email (optional)"></input>
+            <input class="pure-u-1-2" id="site" name="site" type="text" placeholder="Site Web (optional)"></input>
+        </fieldset>
+        <fieldset class="pure-group">
+            <textarea class="pure-u-1-2" id="message" name="message" rows="3" placeholder="Your comment ..." required></textarea>
+        </fieldset>
+        <fieldset>
+            <label for="subscribe" class="pure-checkbox">
+                <input name="subscribe" id="subscribe"
+                type="checkbox">&nbsp;Subscribe to comments on this article (email required)
+            </label>
+            <div class="divhidden">
+                <input id="captcha" name="captcha" type="text" placeholder="Do not fill if you are human"></input>
+                <input name="article" id="article" type="hidden" value="{{ article.cacause_article }}">
+            </div>             
+        </fieldset>
+        <button type="submit" class="button-success pure-button">Submit</button>
+    </form>
+</div>
+
+{% if article.cacause_comment %}
+
+    <p></p>
+    <div id="show-button">
+        {% if article.cacause_comment|length > 1 %}
+        <a class="button-success pure-button" href="javascript:showHide('comments-list', 'show-button');">See the {{ article.cacause_comment|length }} comments</a>
+        {% else %}
+        <a class="button-success pure-button" href="javascript:showHide('comments-list', 'show-button');">View comment</a>
+        {% endif %}
+    </div>
+
+    <div id="comments-list" style="display:none">
+    {% for comment in article.cacause_comment %}
+        <hr>
+        <div class="inline">
+            {% if comment.site %}
+            <a href="{{ comment.site }}">
+            {% endif %}
+            {% if CACAUSE_GRAVATAR and comment.gravatar %}
+            <img src="{{ comment.gravatar }}" height="32" width="32" style="float:left; margin-right:10px"/>
+            {% endif %}
+            {% if comment.site %}
+            </a>
+            {% endif %}
+            <span class="title">{{ comment.author }}</span>
+            {% if comment.date %}
+            <span> - {{ comment.date }}</span>
+            {% endif %}
+        </div>
+        {{ comment.body }}
+    {% endfor %}
+    </div>
+{% endif %}
+
+<script type="text/javascript"><!--
+
+function showHide(panel_id, button_id){
+    if (document.getElementById(panel_id).style.display == 'none'){
+        document.getElementById(panel_id).style.display = '';
+        document.getElementById(button_id).style.display = 'none';
+    } else {
+        document.getElementById(panel_id).style.display = 'none';
+    }
+}
+
+function get_action() {
+  return '/post_a_new_comment';
+}
+
+--></script>

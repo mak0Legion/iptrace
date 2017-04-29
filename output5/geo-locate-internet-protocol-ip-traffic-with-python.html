@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Geo-Locate Internet Protocol (IP) Traffic</title>
+	<meta name="description" content="">
+	<meta name="author" content="Piyush Singh(mak0Legion)">
+
+	<!-- HTML5 shim, for IE6-8 support of HTML elements -->
+	<!--[if lt IE 9]>
+		<script src="./theme/html5.js"></script>
+	<![endif]-->
+
+	<!-- Styles -->
+	<link href="./theme/bootstrap.min.css" rel="stylesheet">
+	<link href="./theme/local.css" rel="stylesheet">
+	<link href="./theme/pygments.css" rel="stylesheet">
+
+	<!-- Feeds -->
+
+
+
+
+</head>
+<body>
+	<div class="topbar">
+	  <div class="topbar-inner">
+		<div class="container-fluid">
+		  <a class="brand" href="./">Geo-Locate Internet Protocol (IP) Traffic</a>
+			<ul class="nav">
+					<li class="active"><a href="./category/python.html">Python</a></li>
+			</ul>
+			<p class="pull-right"><a href="./archives.html">[archives]</a> <a href="./tags.html">[tags]</a></p>
+		</div>
+	  </div>
+	</div>
+
+	<div class="container-fluid">
+	  <div class="sidebar">
+		<div class="well">
+			<h3>Blogroll</h3>
+			<ul>
+				<li><a href="http://getpelican.com/">Pelican</a></li>
+				<li><a href="http://python.org/">Python.org</a></li>
+				<li><a href="http://code.google.com/p/pygeoip/">PyGeoIP</a></li>
+			</ul>
+			<div class="social">
+			<h3>Social</h3>
+			<ul>
+				<li><a href="https://www.facebook.com/noobloops">Facebook</a></li>
+				<li><a href="https://www.instagram.com/noob_loops">Instagram</a></li>
+			</ul>
+			</div>
+		</div>
+	  </div>
+	  <div class="content">
+<div class="page-header"><h1>Geo-Locate Internet Protocol (IP) Traffic With Python</h1></div><section id="content">
+    <article>
+        <header>
+            <h2>
+                <a href=""
+                    rel="bookmark"
+                    title="Permalink to Geo-Locate Internet Protocol (IP) Traffic With Python">
+                        Geo-Locate Internet Protocol (IP) Traffic With Python
+                </a>
+            </h2>
+        </header>
+        <div>
+            <div class="well">
+<footer class="post-info">
+    <span class="label">Date</span>
+    Fri 21 April 2017
+
+    <span class="label">Tags</span>
+        <a href="./tag/forensic-datainvestigation.html"><i class="icon-tag"></i>Forensic DataInvestigation</a>
+</footer>            </div>
+            <p><img alt="Alt Text" src="./images/1.jpg"></p>
+<p>To begin with, we must how to correlate an Internet Protocol (IP) address to a physical
+location. To do this, we will rely on a freely available database from MaxMind, Inc. 
+While MaxMind offers several precise commercial products, its open-source GeoLiteCity
+database available at http://www.maxmind.com/ app/geolitecity offers us enough fidelity to
+correlate IP addresses to cities. Once the database has been downloaded, we need to
+decompress it and move it to a location such as /opt/GeoIP/Geo.dat.</p>
+<blockquote>
+<p>analyst# wget http://geolite.maxmind.com/download/geoip/database/ GeoLiteCity.dat.gz</p>
+<p>2012-03-17 09:02:20-- http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz</p>
+<p>Resolving geolite.maxmind.com... 174.36.207.186</p>
+<p>Connecting to geolite.maxmind.com|174.36.207.186|:80... connected. </p>
+<p>HTTP request sent, awaiting response... 200 OK</p>
+<p>Length: 9866567 (9.4M) [text/plain]</p>
+<p>Saving to: 'GeoLiteCity.dat.gz'</p>
+<p>100%[================================================ ==================================================== ==================================================&gt;] 9,866,567 724K/s in 15s k</p>
+<p>2012-03-17 09:02:36 (664 KB/s) – 'GeoLiteCity.dat.gz' saved [9866567/9866567]</p>
+<p>analyst#gunzip GeoLiteCity.dat.gz analyst#mkdir /opt/GeoIP</p>
+<p>analyst#mv GeoLiteCity.dat /opt/GeoIP/Geo.dat</p>
+</blockquote>
+<p>With the GeoCityLite database, we can correlate an IP address to a state, postal code, 
+country name, and general latitude and longitude coordinates. 
+All of this will prove useful in analyzing IP traffic.</p>
+<h2>Using PyGeoIP to Correlate IP to Physical Locations</h2>
+<p>Jennifer Ennis produced a pure Python library to query the GeoLiteCity data- base. Her 
+library can be downloaded from <a href="http://code.google.com/p/pygeoip/">pygeoip</a> and installed prior to 
+importing it into a Python script. Note that we will first instantiate a GeoIP class with 
+the location of our uncompressed database. Next we will query the database for a specific 
+record, specifying the IP address. This returns a record containing fields for city, 
+region_name, postal_code, coun- try_name, latitude and longitude, among other 
+identifiable information.</p>
+<p>CODE Below:</p>
+<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pygeoip</span>
+<span class="n">gi</span> <span class="o">=</span> <span class="n">pygeoip</span><span class="o">.</span><span class="n">GeoIP</span><span class="p">(</span><span class="s1">&#39;/opt/GeoIP/Geo.dat&#39;</span><span class="p">)</span> <span class="k">def</span> <span class="nf">printRecord</span><span class="p">(</span><span class="n">tgt</span><span class="p">):</span>
+<span class="n">rec</span> <span class="o">=</span> <span class="n">gi</span><span class="o">.</span><span class="n">record_by_name</span><span class="p">(</span><span class="n">tgt</span><span class="p">)</span> <span class="n">city</span> <span class="o">=</span> <span class="n">rec</span><span class="p">[</span><span class="s1">&#39;city&#39;</span><span class="p">]</span>
+<span class="n">region</span> <span class="o">=</span> <span class="n">rec</span><span class="p">[</span><span class="s1">&#39;region_name&#39;</span><span class="p">]</span> <span class="n">country</span> <span class="o">=</span> <span class="n">rec</span><span class="p">[</span><span class="s1">&#39;country_name&#39;</span><span class="p">]</span> <span class="nb">long</span> <span class="o">=</span> <span class="n">rec</span><span class="p">[</span><span class="s1">&#39;longitude&#39;</span><span class="p">]</span>
+<span class="n">lat</span> <span class="o">=</span> <span class="n">rec</span><span class="p">[</span><span class="s1">&#39;latitude&#39;</span><span class="p">]</span>
+<span class="k">print</span> <span class="s1">&#39;[*] Target: &#39;</span> <span class="o">+</span> <span class="n">tgt</span> <span class="o">+</span> <span class="s1">&#39; Geo-located. &#39;</span>
+<span class="k">print</span> <span class="s1">&#39;[+] &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">city</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;, &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">region</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;, &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">country</span><span class="p">)</span> <span class="k">print</span> <span class="s1">&#39;[+] Latitude: &#39;</span>
+<span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span><span class="o">+</span> <span class="s1">&#39;, Longitude: &#39;</span><span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">long</span><span class="p">)</span>
+<span class="n">tgt</span> <span class="o">=</span> <span class="s1">&#39;173.255.226.98&#39;</span> <span class="n">printRecord</span><span class="p">(</span><span class="n">tgt</span><span class="p">)</span>
+</pre></div>
+
+
+<p>Running the script, we see that it produces output showing the target IP’s physical 
+location in Jersey City, NJ, US, with latitude 40.7245 and longitude −74.0621. Now that 
+we are able to correlate an IP to a physical address, let’s begin writing our analysis 
+script.</p>
+<div class="highlight"><pre><span></span><span class="n">analyst</span><span class="c1"># python printGeo.py</span>
+<span class="p">[</span><span class="o">*</span><span class="p">]</span> <span class="n">Target</span><span class="p">:</span> <span class="mf">173.255</span><span class="o">.</span><span class="mf">226.98</span> <span class="n">Geo</span><span class="o">-</span><span class="n">located</span><span class="o">.</span> <span class="p">[</span><span class="o">+</span><span class="p">]</span> <span class="n">Jersey</span> <span class="n">City</span><span class="p">,</span> <span class="n">NJ</span><span class="p">,</span> <span class="n">United</span> <span class="n">States</span>
+<span class="p">[</span><span class="o">+</span><span class="p">]</span> <span class="n">Latitude</span><span class="p">:</span> <span class="mf">40.7245</span><span class="p">,</span> <span class="n">Longitude</span><span class="p">:</span> <span class="err">−</span><span class="mf">74.0621</span>
+</pre></div>
+
+
+<p>Thanking You
+Do Share this efforts.</p>            
+        </div>
+	<div class="comment">
+<div id="submit-button">
+    <a class="button-success pure-button" href="javascript:showHide('comment-form', 'submit-button');">Commenter</a>
+</div>
+
+<div id="comment-form" style="display:none">
+    <form class="pure-form" role="form" action="" onsubmit="this.action=get_action();" method="post">
+        <fieldset class="pure-group">
+
+            <input class="pure-u-1-2" id="author" name="author" type="text" placeholder="
+Name or Nickname (required)" required></input>
+            <input class="pure-u-1-2" id="email" name="email" type="email" placeholder="Email (optional)"></input>
+            <input class="pure-u-1-2" id="site" name="site" type="text" placeholder="Site Web (optional)"></input>
+        </fieldset>
+        <fieldset class="pure-group">
+            <textarea class="pure-u-1-2" id="message" name="message" rows="3" placeholder="Your comment ..." required></textarea>
+        </fieldset>
+        <fieldset>
+            <label for="subscribe" class="pure-checkbox">
+                <input name="subscribe" id="subscribe"
+                type="checkbox">&nbsp;Subscribe to comments on this article (email required)
+            </label>
+            <div class="divhidden">
+                <input id="captcha" name="captcha" type="text" placeholder="Do not fill if you are human"></input>
+                <input name="article" id="article" type="hidden" value="">
+            </div>             
+        </fieldset>
+        <button type="submit" class="button-success pure-button">Submit</button>
+    </form>
+</div>
+
+
+<script type="text/javascript"><!--
+
+function showHide(panel_id, button_id){
+    if (document.getElementById(panel_id).style.display == 'none'){
+        document.getElementById(panel_id).style.display = '';
+        document.getElementById(button_id).style.display = 'none';
+    } else {
+        document.getElementById(panel_id).style.display = 'none';
+    }
+}
+
+function get_action() {
+  return '/post_a_new_comment';
+}
+
+--></script>        </div>
+   </article>
+</section>
+		<footer>
+		  <p>Powered by <a href="http://getpelican.com/">Pelican</a>. Theme based on <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap</a>.</p>
+		  <p>&copy; Piyush Singh(mak0Legion)</p>
+		</footer>
+	  </div>
+
+	</div>
+</body>
+</html>
